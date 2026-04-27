@@ -1,0 +1,55 @@
+# 🔥 Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 🔥 Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# 🔥 PyCharm / IntelliJ
+.idea/
+
+# 🔥 VSCode (혹시 사용할 경우)
+.vscode/
+
+# 🔥 Mac / Windows system files
+.DS_Store
+Thumbs.db
+
+# 🔥 Logs
+*.log
+
+# 🔥 Environment variables (중요!)
+.env
+
+# 🔥 Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# 🔥 Build / distribution
+build/
+dist/
+*.egg-info/
+
+# 🔥 Testing / coverage
+.coverage
+htmlcov/
+
+# 🔥 Database / local files
+*.sqlite3
+
+# 🔥 Temporary files
+*.tmp
+*.swp
+
+# 🔥 Model / large files (필요하면)
+*.pt
+*.pth
+*.h5
+
+# 🔥 API keys / secrets (절대 업로드 금지)
+secregit init
+git add .
+git commit -m "initial commit"
