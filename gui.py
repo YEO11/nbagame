@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH    = os.path.join(BASE_DIR, "data", "teams_players.json")
+JSON_PATH    = os.path.join(BASE_DIR, "data", "player_data.json")
 LOGOS_DIR    = os.path.join(BASE_DIR, "data", "logos")
 PLAYERS_DIR  = os.path.join(BASE_DIR, "data", "players")
 NUM_PLAYERS  = 2

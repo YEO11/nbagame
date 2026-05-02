@@ -2,7 +2,7 @@ import json
 from random import choice
 from time import sleep
 
-JSON_file = r"C:\Users\백승열\Desktop\NBA_DRAFT_GAME\teams_players.json"
+JSON_file = r"C:\Users\백승열\PycharmProjects\nba_draft\data\player_data.json"
 
 TEAM_NAMES = {
     "ATL": "Atlanta Hawks",

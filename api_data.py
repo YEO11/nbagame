@@ -1,7 +1,7 @@
 """
 build_nba_data.py
 =================
-Rebuilds teams_players.json using the nba_api package and downloads
+Rebuilds player_data.json using the nba_api package and downloads
 player headshots into the nba_players/ folder.
 
 Install dependencies first:
@@ -11,7 +11,7 @@ Run:
     python build_nba_data.py
 
 Output:
-    data/teams_players.json          ← same format as original
+    data/player_data.json          ← same format as original
     nba_players/<First_Last>.png     ← headshots (NBA CDN, 1040x760)
 
 Notes:
@@ -49,8 +49,8 @@ except ImportError:
     )
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-BASE_DIR     = r"C:\Users\백승열\Desktop\NBA_DRAFT_GAME"
-OUT_JSON     = os.path.join(BASE_DIR, "data", "teams_players.json")
+BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
+OUT_JSON     = os.path.join(BASE_DIR, "data", "player_data.json")
 PLAYERS_DIR  = os.path.join(BASE_DIR, "nba_players")
 
 os.makedirs(PLAYERS_DIR, exist_ok=True)
