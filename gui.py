@@ -6,7 +6,7 @@ import os
 from PIL import Image, ImageTk
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
-BASE_DIR     = r"C:\Users\(add yours)\Desktop\NBA_DRAFT_GAME"
+BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 JSON_PATH    = os.path.join(BASE_DIR, "data", "teams_players.json")
 LOGOS_DIR    = os.path.join(BASE_DIR, "data", "logos")
 PLAYERS_DIR  = os.path.join(BASE_DIR, "data", "players")
