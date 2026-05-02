@@ -71,7 +71,7 @@ TEAM_COLORS = {
     "DET": "#C8102E", "GSW": "#FFC72C", "HOU": "#970C2F", "IND": "#FDBB30",
     "LAC": "#C8102E", "LAL": "#FDB927", "MEM": "#5D76A9", "MIA": "#F9A01B",
     "MIL": "#EEE1C6", "MIN": "#78BE20", "NOP": "#C8A956", "NYK": "#F58426",
-    "OKC": "#EF3B24", "ORL": "#C4CED4", "PHI": "#006BB6", "PHX": "#E56020",
+    "OKC": "#007cc2", "ORL": "#C4CED4", "PHI": "#006BB6", "PHX": "#E56020",
     "POR": "#E03A3E", "SAC": "#5A2D81", "SAS": "#C4CED4", "TOR": "#F3688B",
     "UTA": "#F9A01B", "WAS": "#E31837",
 }
@@ -210,7 +210,7 @@ class NBADraftApp(tk.Tk):
                                   bg=BG3, fg=TEXT,
                                   selectbackground="#1E3A5A",
                                   selectforeground=ACCENT,
-                                  font=("Arial", 12), bd=0,
+                                  font=("Arial", 10), bd=0,
                                   highlightthickness=0, relief="flat",
                                   activestyle="none", height=7,
                                   exportselection=False)
@@ -352,7 +352,7 @@ class NBADraftApp(tk.Tk):
         card = tk.Frame(self.frm_card, bg=BG2)
         card.pack(fill="x", ipady=6)
 
-        img = load_player_img(name, (76, 76))
+        img = load_player_img(name, (100, 76))
         if img:
             lbl_img = tk.Label(card, image=img, bg=BG2, bd=0)
             lbl_img.image = img
