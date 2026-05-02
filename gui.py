@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 BASE_DIR     = r"C:\Users\백승열\Desktop\NBA_DRAFT_GAME"
 JSON_PATH    = os.path.join(BASE_DIR, "data", "teams_players.json")
 LOGOS_DIR    = os.path.join(BASE_DIR, "data", "logos")
-PLAYERS_DIR  = os.path.join(BASE_DIR, "data", "players")   # First_Last.png
+PLAYERS_DIR  = os.path.join(BASE_DIR, "data", "players")
 NUM_PLAYERS  = 2
 POSITIONS    = ["PG", "SG", "SF", "PF", "C"]
 
@@ -68,11 +68,11 @@ TEAM_NAMES = {
 TEAM_COLORS = {
     "ATL": "#E03A3E", "BOS": "#007A33", "BKN": "#AAAAAA", "CHA": "#00788C",
     "CHI": "#CE1141", "CLE": "#860038", "DAL": "#00538C", "DEN": "#FEC524",
-    "DET": "#C8102E", "GSW": "#FFC72C", "HOU": "#CE1141", "IND": "#FDBB30",
+    "DET": "#C8102E", "GSW": "#FFC72C", "HOU": "#970C2F", "IND": "#FDBB30",
     "LAC": "#C8102E", "LAL": "#FDB927", "MEM": "#5D76A9", "MIA": "#F9A01B",
     "MIL": "#EEE1C6", "MIN": "#78BE20", "NOP": "#C8A956", "NYK": "#F58426",
     "OKC": "#EF3B24", "ORL": "#C4CED4", "PHI": "#006BB6", "PHX": "#E56020",
-    "POR": "#E03A3E", "SAC": "#5A2D81", "SAS": "#C4CED4", "TOR": "#CE1141",
+    "POR": "#E03A3E", "SAC": "#5A2D81", "SAS": "#C4CED4", "TOR": "#F3688B",
     "UTA": "#F9A01B", "WAS": "#E31837",
 }
 
@@ -92,7 +92,6 @@ with open(JSON_PATH, "r", encoding="utf-8") as f:
     ALL_TEAMS = json.load(f)
 
 VALID_KEYS = [k for k in LOGO_FILES if k in ALL_TEAMS]
-
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
 def luminance(hex_color):
@@ -127,10 +126,10 @@ def load_player_img(player_name, size=(80, 80)):
 class NBADraftApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("NBA Draft Game  \u2022  82-0 or Die")
+        self.title("NBA Draft Game")
         self.configure(bg=BG)
-        self.resizable(True, True)
-        self.minsize(920, 700)
+        self.resizable(False, False)
+        self.minsize(920, 800)
         self.geometry("980x730")
 
         self._logo_cache = {}
@@ -147,12 +146,15 @@ class NBADraftApp(tk.Tk):
         self._render_rosters()
         self._start_turn()
 
+        self.icon_img = tk.PhotoImage(file="logo.png")
+        self.iconphoto(False, self.icon_img)
+
     # ── UI BUILD ──────────────────────────────────────────────────────────────
     def _build_ui(self):
         topbar = tk.Frame(self, bg=BG2, height=50)
         topbar.pack(fill="x")
         topbar.pack_propagate(False)
-        tk.Label(topbar, text="\U0001f3c0  82-0 or die: All-time versus", bg=BG2, fg=ACCENT,
+        tk.Label(topbar, text="\U0001f3c0  NBA Draft Simulation", bg=BG2, fg=ACCENT,
                  font=("Arial Black", 13, "bold")).pack(side="left", padx=18, pady=12)
         self.lbl_topstatus = tk.Label(topbar, text="", bg=BG2, fg=MUTED,
                                       font=("Arial", 10))
