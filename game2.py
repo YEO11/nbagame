@@ -1,11 +1,11 @@
 import tkinter as tk
 import json
 import random
-import requests
 import threading
 import os
 from PIL import Image, ImageTk
 import unicodedata
+import random
 
 # --- CONFIG ---
 API_KEY = "2k_yq440mfukup3lmaxovd2cqdvf0xzy2z0"
@@ -24,10 +24,8 @@ PLAYER_IMG_DIR = os.path.join(BASE_DIR, "data", "players")
 
 
 def normalize_name(name):
-    """Removes accents and converts to lowercase for reliable matching."""
-    if not name: return ""
-    return unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode().lower()
-
+    """Standardizes names to avoid issues with accents and casing."""
+    return unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode().lower().strip()
 
 class NBA2KSimGame(tk.Tk):
     def __init__(self):
@@ -36,104 +34,87 @@ class NBA2KSimGame(tk.Tk):
         self.geometry("1100x850")
         self.configure(bg=BG)
 
-        # Initialize Database
-        self.player_db = {}
-
+        # 1. Load the full pool
         with open("data/popular_players.json", 'r') as f:
-            self.pool = json.load(f)
+            full_pool = json.load(f)
 
+        # 2. Pick CPU Team first
+        self.cpu_team = {pos: random.choice(full_pool[pos]) for pos in POSITIONS}
+
+        # 3. Create a Filtered Pool for the User (Excludes CPU players)
+        # We use a set of names for O(1) lookup speed
+        cpu_player_names = {p['name'] for p in self.cpu_team.values()}
+
+        self.pool = {}
+        for pos in POSITIONS:
+            self.pool[pos] = [p for p in full_pool[pos] if p['name'] not in cpu_player_names]
+
+        # Initialize User variables
+        self.player_db = {}
         self.user_team = {pos: None for pos in POSITIONS}
-        self.cpu_team = {pos: random.choice(self.pool[pos]) for pos in POSITIONS}
-
         self.current_round = 1
         self.draft_options = {}
         self.is_shuffling = False
 
         self._build_ui()
 
-        # Load data in a thread so the UI doesn't freeze at startup
+        # Load data in a thread
         threading.Thread(target=self.load_all_players, daemon=True).start()
 
         self.start_round()
 
     # ---------------- Data Loading ----------------
     def load_all_players(self):
-        """Fetches all players from the API using pagination."""
-        self.status_label.config(text="Connecting to 2K Database...", fg=MUTED)
+        """Loads the pre-synced high-rating player pool from the local JSON file."""
+        self.status_label.config(text="Loading Local Player Pool...", fg=MUTED)
 
-        all_fetched_players = []
-        cursor = None
+        file_path = r"data\2k_data.json"
 
-        while True:
-            try:
-                # Prepare parameters - only include cursor if we are on page 2+
-                params = {"teamType": "allt", "limit": 100}
-                if cursor:
-                    params["cursor"] = cursor
+        if not os.path.exists(file_path):
+            self.status_label.config(text="Error: synced_players.json missing!", fg="red")
+            print("❌ Critical Error: You need to run the sync script first.")
+            return
 
-                response = requests.get(
-                    "https://api.nba2kapi.com/api/players",
-                    params=params,
-                    headers={'X-API-Key': API_KEY},
-                    timeout=10  # Prevents the thread from hanging forever
-                )
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
 
-                # Check for HTTP errors (e.g., 401 Unauthorized, 500 Server Error)
-                if response.status_code != 200:
-                    print(f"HTTP Error: {response.status_code}")
-                    self.status_label.config(text=f"Server Error ({response.status_code})", fg="red")
-                    break
+            # Reset local database
+            self.player_db = {}
+            total_count = 0
 
-                data = response.json()
+            # Flatten the position-based JSON into a lookup dictionary
+            for pos, players in data.items():
+                for p in players:
+                    # Use normalized name as key for fast O(1) lookup
+                    key = normalize_name(p["name"])
+                    self.player_db[key] = p
+                    total_count += 1
 
-                if not data.get("success"):
-                    print("API Error:", data.get("message", "Unknown error"))
-                    self.status_label.config(text="API Key Error / Limit Reached", fg="red")
-                    break
+            print(f"✅ Successfully loaded {total_count} players.")
 
-                # Extract data
-                batch = data.get("data", [])
-                all_fetched_players.extend(batch)
+            # UI Update
+            self.status_label.config(
+                text=f"Database Ready: {total_count} Players Loaded",
+                fg=ACCENT
+            )
 
-                # UI Update: Show progress to the user
-                self.status_label.config(
-                    text=f"Downloading Database... ({len(all_fetched_players)} players)",
-                    fg=MUTED
-                )
-
-                # Pagination Logic: Check if there's a next page
-                pagination = data.get("pagination", {})
-                if not pagination.get("hasMore") or not pagination.get("nextCursor"):
-                    break
-
-                cursor = pagination.get("nextCursor")
-
-            except requests.exceptions.RequestException as e:
-                print(f"Connection Error: {e}")
-                self.status_label.config(text="Connection Lost. Check Internet.", fg="red")
-                return
-
-        # Map list to local dictionary for O(1) fast lookup during simulation
-        for p in all_fetched_players:
-            key = normalize_name(p["name"])
-            self.player_db[key] = p
-
-        print(f"Successfully loaded {len(self.player_db)} players.")
-
-        # Final UI Update
-        self.status_label.config(text="Database Ready. Start Drafting!", fg=ACCENT)
+        except Exception as e:
+            print(f"Failed to parse JSON: {e}")
+            self.status_label.config(text="Database Corrupted", fg="red")
 
     # ---------------- UI ----------------
     def _build_ui(self):
-        top = tk.Frame(self, bg=BG2, height=60)
+        top = tk.Frame(self, bg=BG2, height=50)
         top.pack(fill="x")
+        top.pack_propagate(False)
 
-        tk.Label(top, text="NBA 2K SERIES SIMULATOR",
-                 bg=BG2, fg=ACCENT, font=("Arial Black", 16)).pack(side="left", padx=20)
+        tk.Label(top, text="\U0001f3c0  NBA 2K Series Simulator",
+                 bg=BG2, fg=ACCENT, font=("Arial Black", 13, "bold")).pack(side="left", padx=18, pady=12)
 
         self.round_label = tk.Label(top, text=f"ROUND {self.current_round}/5",
-                                    bg=BG2, fg=TEXT, font=("Arial", 12, "bold"))
-        self.round_label.pack(side="right", padx=20)
+                                    bg=BG2, fg=MUTED, font=("Arial", 10))
+        self.round_label.pack(side="right", padx=18)
 
         # CPU
         tk.Label(self, text="OPPONENT TEAM", bg=BG, fg="red",
@@ -239,89 +220,51 @@ class NBA2KSimGame(tk.Tk):
         threading.Thread(target=self.run_simulation).start()
 
     # ---------- ATTRIBUTE MODELS ----------
-    def scoring(self, s):
-        return (s.get('closeShot', 70) * 0.10 + s.get('layup', 70) * 0.10 +
-                s.get('drivingDunk', 70) * 0.10 + s.get('midRangeShot', 70) * 0.15 +
-                s.get('threePointShot', 70) * 0.20 + s.get('freeThrow', 70) * 0.05 +
-                s.get('shotIQ', 70) * 0.15 + s.get('offensiveConsistency', 70) * 0.15)
-
-    def playmaking(self, s):
-        return (s.get('ballHandle', 70) * 0.30 + s.get('passAccuracy', 70) * 0.25 +
-                s.get('passIQ', 70) * 0.25 + s.get('passVision', 70) * 0.10 +
-                s.get('speedWithBall', 70) * 0.10)
-
-    def defense(self, s):
-        return (s.get('perimeterDefense', 70) * 0.25 + s.get('interiorDefense', 70) * 0.20 +
-                s.get('steal', 70) * 0.15 + s.get('block', 70) * 0.15 +
-                s.get('helpDefenseIQ', 70) * 0.15 + s.get('defensiveConsistency', 70) * 0.10)
-
-    def athleticism(self, s):
-        return (s.get('speed', 70) * 0.25 + s.get('agility', 70) * 0.20 +
-                s.get('vertical', 70) * 0.15 + s.get('strength', 70) * 0.15 +
-                s.get('stamina', 70) * 0.25)
-
-    def player_impact(self, s, position):
-        base = (self.scoring(s) * 0.35 + self.playmaking(s) * 0.20 +
-                self.defense(s) * 0.20 + self.athleticism(s) * 0.15 +
-                (s.get('intangibles', 70) * 0.10))
-
-        if position == "PG":
-            base += self.playmaking(s) * 0.10
-        elif position == "SG":
-            base += self.scoring(s) * 0.05
-        elif position in ["PF", "C"]:
-            base += self.defense(s) * 0.08
-        return base
-
-    def simulate_team(self, team_dict, stats_list):
-        total = 0
-        for (pos, player), s in zip(team_dict.items(), stats_list):
-            impact = self.player_impact(s, pos)
-            consistency = s.get('offensiveConsistency', 70) / 100
-            variance = random.gauss(0, 5 * (1 - consistency))
-            total += impact + variance
-        return total
-
-    # ---------- SIMULATION ----------
-    # Ensure this is aligned with your other "def" statements inside the class
-    def fetch_player_data(self, name):
-        """Instant local lookup."""
-        normalized = normalize_name(name)
-        player = self.player_db.get(normalized)
-
-        if player:
-            return player
-
-        print(f"Match not found for: {name}")
-        # Default fallback stats
-        return {"overall": 80, "offensiveConsistency": 75, "threePointShot": 75}
+    import random
 
     def run_simulation(self):
-        # Safety Check: Filter out None values in case the simulation
-        # is triggered before the draft is 100% full.
+        # Ensure draft is complete
         user_players = [p for p in self.user_team.values() if p is not None]
         cpu_players = [p for p in self.cpu_team.values() if p is not None]
 
-        if len(user_players) < 5:
+        if len(user_players) < 5 or len(cpu_players) < 5:
             print("Draft not complete!")
             return
 
-        # Now we fetch the data from our loaded dictionary
-        user_stats = [self.fetch_player_data(p['name']) for p in user_players]
-        cpu_stats = [self.fetch_player_data(p['name']) for p in cpu_players]
+        # Calculate team strength
+        def calculate_strength(player_list, team_label):
+            print(f"\n--- {team_label} Ratings ---")
+            total_overall = 0
+            for p in player_list:
+                # Look up in the database
+                data = self.player_db.get(normalize_name(p['name']), {"overall": 80})
+                rating = data.get("overall", 80)
 
-        def get_team_power(team, stats, samples=20):
-            # Pass the actual team dict keys (positions) to the impact calculator
-            return sum(self.simulate_team(team, stats) for _ in range(samples)) / samples
+                # Print individual player rating
+                print(f"{p['name']}: {rating}")
 
-        u_pwr = get_team_power(self.user_team, user_stats)
-        c_pwr = get_team_power(self.cpu_team, cpu_stats)
+                total_overall += rating
+
+            avg = total_overall / len(player_list)
+            return avg
+
+        # Calculate and Print
+        u_pwr = calculate_strength(user_players, "USER TEAM")
+        c_pwr = calculate_strength(cpu_players, "CPU TEAM")
+
+        print("-" * 30)
+        print(f"FINAL TEAM POWER -> USER: {u_pwr:.2f} | CPU: {c_pwr:.2f}")
+        print("-" * 30)
 
         u_wins, c_wins, log = 0, 0, []
+
+        # Best of 7 Series
         while u_wins < 4 and c_wins < 4:
-            u_s = self.simulate_team(self.user_team, user_stats)
-            c_s = self.simulate_team(self.cpu_team, cpu_stats)
-            if u_s > c_s:
+            # Game Day Luck (variance)
+            u_performance = u_pwr + random.uniform(-3, 3)
+            c_performance = c_pwr + random.uniform(-3, 3)
+
+            if u_performance > c_performance:
                 u_wins += 1
                 log.append("W")
             else:
@@ -331,10 +274,10 @@ class NBA2KSimGame(tk.Tk):
         self.show_results(u_wins, c_wins, log, u_pwr, c_pwr)
 
     def show_results(self, u, c, log, u_pwr, c_pwr):
-        prob = 1 / (1 + pow(10, (c_pwr - u_pwr) / 15))  # Adjusted Elo-style constant
+        prob = 1 / (1 + pow(10, (c_pwr - u_pwr) / 15))
         proj_w = round(prob * 82)
 
-        txt = f"SERIES RESULT: {u}-{c} | {' '.join(log)}\n82-GAME PROJECTION: {proj_w}-{82 - proj_w}"
+        txt = f"SERIES RESULT: {u}-{c} \n82-GAME PROJECTION: {proj_w}-{82 - proj_w}"
         color = "#4BB543" if u == 4 else "#FF4B4B"
 
         self.after(0, lambda: self.status_label.config(text=txt, fg=color, font=("Arial Black", 14)))

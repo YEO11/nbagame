@@ -27,7 +27,6 @@
     { "name": "Jerry West", "slug": "jerry-west", "image": "Jerry_West.png", "position": "SG" },
     { "name": "Clyde Drexler", "slug": "clyde-drexler", "image": "Clyde_Drexler.png", "position": "SG" },
     { "name": "Allen Iverson", "slug": "allen-iverson", "image": "Allen_Iverson.png", "position": "SG" },
-    { "name": "Reggie Miller", "slug": "reggie-miller", "image": "Reggie_Miller.png", "position": "SG" },
     { "name": "Ray Allen", "slug": "ray-allen", "image": "Ray_Allen.png", "position": "SG" },
     { "name": "George Gervin", "slug": "george-gervin", "image": "George_Gervin.png", "position": "SG" },
     { "name": "Klay Thompson", "slug": "klay-thompson", "image": "Klay_Thompson.png", "position": "SG" },
@@ -62,7 +61,6 @@
   "PF": [
     { "name": "Tim Duncan", "slug": "tim-duncan", "image": "Tim_Duncan.png", "position": "PF" },
     { "name": "Karl Malone", "slug": "karl-malone", "image": "Karl_Malone.png", "position": "PF" },
-    { "name": "Charles Barkley", "slug": "charles-barkley", "image": "Charles_Barkley.png", "position": "PF" },
     { "name": "Kevin Garnett", "slug": "kevin-garnett", "image": "Kevin_Garnett.png", "position": "PF" },
     { "name": "Dirk Nowitzki", "slug": "dirk-nowitzki", "image": "Dirk_Nowitzki.png", "position": "PF" },
     { "name": "Giannis Antetokounmpo", "slug": "giannis-antetokounmpo", "image": "Giannis_Antetokounmpo.png", "position": "PF" },
