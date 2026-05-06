@@ -63,6 +63,10 @@ class NBA2KSimGame(tk.Tk):
 
         self.start_round()
 
+        self.icon_img = tk.PhotoImage(file="logo.png")
+        self.iconphoto(False, self.icon_img)
+
+
     # ---------------- Data Loading ----------------
     def load_all_players(self):
         """Loads the pre-synced high-rating player pool from the local JSON file."""
