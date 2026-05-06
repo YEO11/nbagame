@@ -113,7 +113,7 @@ class NBA2KSimGame(tk.Tk):
                  bg=BG2, fg=ACCENT, font=("Arial Black", 13, "bold")).pack(side="left", padx=18, pady=12)
 
         self.round_label = tk.Label(top, text=f"ROUND {self.current_round}/5",
-                                    bg=BG2, fg=MUTED, font=("Arial", 10))
+                                    bg=BG2, fg=MUTED, font=("Arial", 9))
         self.round_label.pack(side="right", padx=18)
 
         # CPU
@@ -127,7 +127,7 @@ class NBA2KSimGame(tk.Tk):
         tk.Frame(self, bg=BG3, height=2).pack(fill="x", padx=100, pady=20)
 
         # USER
-        tk.Label(self, text="YOUR DRAFT", bg=BG, fg=ACCENT,
+        tk.Label(self, text="YOUR TEAM", bg=BG, fg=ACCENT,
                  font=("Arial", 12, "bold")).pack()
 
         self.user_frame = tk.Frame(self, bg=BG)
@@ -260,7 +260,6 @@ class NBA2KSimGame(tk.Tk):
 
         # Best of 7 Series
         while u_wins < 4 and c_wins < 4:
-            # Game Day Luck (variance)
             u_performance = u_pwr + random.uniform(-3, 3)
             c_performance = c_pwr + random.uniform(-3, 3)
 
