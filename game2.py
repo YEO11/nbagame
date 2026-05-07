@@ -253,7 +253,6 @@ class NBA2KSimGame(tk.Tk):
         team_attributes = {}
 
         for p in team_list:
-            # FIX 1 & 2: Use self.normalize_name and self.get_weight
             name_key = self.normalize_name(p['name'])
             player_data = self.player_db.get(name_key, {})
             attrs = player_data.get("attributes", {})
@@ -305,27 +304,29 @@ class NBA2KSimGame(tk.Tk):
 
         u_wins, c_wins, log = 0, 0, []
 
-        win_chance = 0.5 + (avg_diff / 45)
-        win_chance = max(0.1, min(0.9, win_chance))
+        win_chance = (u_rating / c_rating) * 0.5
+        win_chance = max(0.2, min(0.8, win_chance))
 
-        while u_wins < 4 and c_wins < 4:
+        print(win_chance)
+
+        while u_wins < 40 and c_wins < 40:
             if random.random() < win_chance:
                 u_wins += 1
-                log.append("W")
+                if u_wins > 0 and u_wins % 10 == 0:
+                    log.append("W")
             else:
                 c_wins += 1
-                log.append("L")
+                if c_wins > 0 and c_wins % 10 == 0:
+                    log.append("L")
 
         # FIX 3: Pass avg_diff as both u_pwr and use it to derive c_pwr (0 baseline)
-        self.show_results(u_wins, c_wins, log, avg_diff)
+        self.show_results(u_wins//10, c_wins//10, log, u_rating)
 
     # FIX 3: Corrected signature — avg_diff encodes the user advantage over CPU
-    def show_results(self, u, c, log, avg_diff):
+    def show_results(self, u, c, log, u_pwr):
         # avg_diff > 0 means user is stronger; treat CPU power as 0 baseline
-        u_pwr = avg_diff
-        c_pwr = 0
 
-        prob = 1 / (1 + pow(10, (c_pwr - u_pwr) / 10))
+        prob = u_pwr/100 * 1.1875
         proj_w = round(41 + prob*41)
 
         print(f"🏆 Win rate: {prob}" )
