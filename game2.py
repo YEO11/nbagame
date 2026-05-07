@@ -1,6 +1,5 @@
 import tkinter as tk
 import json
-import random
 import threading
 import os
 from PIL import Image, ImageTk
@@ -23,10 +22,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PLAYER_IMG_DIR = os.path.join(BASE_DIR, "data", "players")
 
 
-def normalize_name(name):
-    """Standardizes names to avoid issues with accents and casing."""
-    return unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode().lower().strip()
-
 class NBA2KSimGame(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -42,7 +37,6 @@ class NBA2KSimGame(tk.Tk):
         self.cpu_team = {pos: random.choice(full_pool[pos]) for pos in POSITIONS}
 
         # 3. Create a Filtered Pool for the User (Excludes CPU players)
-        # We use a set of names for O(1) lookup speed
         cpu_player_names = {p['name'] for p in self.cpu_team.values()}
 
         self.pool = {}
@@ -58,14 +52,21 @@ class NBA2KSimGame(tk.Tk):
 
         self._build_ui()
 
+        # FIX 4: Load icon before starting background thread
+        try:
+            self.icon_img = tk.PhotoImage(file="logo.png")
+            self.iconphoto(False, self.icon_img)
+        except Exception:
+            pass  # Skip icon if file missing
+
         # Load data in a thread
         threading.Thread(target=self.load_all_players, daemon=True).start()
 
         self.start_round()
 
-        self.icon_img = tk.PhotoImage(file="logo.png")
-        self.iconphoto(False, self.icon_img)
-
+    def normalize_name(self, name):
+        """Standardizes names to avoid issues with accents and casing."""
+        return unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode().lower().strip()
 
     # ---------------- Data Loading ----------------
     def load_all_players(self):
@@ -75,29 +76,23 @@ class NBA2KSimGame(tk.Tk):
         file_path = r"data\2k_data.json"
 
         if not os.path.exists(file_path):
-            self.status_label.config(text="Error: synced_players.json missing!", fg="red")
-            print("❌ Critical Error: You need to run the sync script first.")
+            self.status_label.config(text="Error: 2k_data.json missing!", fg="red")
             return
 
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
-            # Reset local database
             self.player_db = {}
             total_count = 0
 
-            # Flatten the position-based JSON into a lookup dictionary
             for pos, players in data.items():
                 for p in players:
-                    # Use normalized name as key for fast O(1) lookup
-                    key = normalize_name(p["name"])
+                    # FIX 1: Use self.normalize_name (instance method)
+                    key = self.normalize_name(p["name"])
                     self.player_db[key] = p
                     total_count += 1
 
-            print(f"✅ Successfully loaded {total_count} players.")
-
-            # UI Update
             self.status_label.config(
                 text=f"Database Ready: {total_count} Players Loaded",
                 fg=ACCENT
@@ -210,7 +205,8 @@ class NBA2KSimGame(tk.Tk):
             self.status_label.config(text="Select your player!", fg=TEXT)
 
     def select_player(self, pos, player):
-        if self.is_shuffling: return
+        if self.is_shuffling:
+            return
         self.user_team[pos] = player
         self.current_round += 1
         self.render_team(self.user_team, self.user_frame)
@@ -224,63 +220,118 @@ class NBA2KSimGame(tk.Tk):
         threading.Thread(target=self.run_simulation).start()
 
     # ---------- ATTRIBUTE MODELS ----------
-    import random
+    SCORING_ATTRS = ['closeShot', 'midRangeShot', 'threePointShot', 'drivingLayup', 'drivingDunk', 'postFade',
+                     'postHook']
+    PLAYMAKING_ATTRS = ['passAccuracy', 'passIQ', 'passVision', 'ballHandle', 'speedWithBall']
+    DEFENSE_ATTRS = ['perimeterDefense', 'interiorDefense', 'helpDefenseIQ', 'steal', 'block', 'passPerception']
+    PHYSICAL_ATTRS = ['speed', 'agility', 'strength', 'vertical', 'stamina', 'hustle']
+    REBOUND_ATTRS = ['offensiveRebound', 'defensiveRebound']
+
+    POSITION_WEIGHTS = {
+        "PG": {"playmaking": 0.45, "scoring": 0.10, "defense": 0.15, "rebound": 0.10},
+        "SG": {"playmaking": 0.20, "scoring": 0.30, "defense": 0.15, "rebound": 0.10},
+        "SF": {"playmaking": 0.20, "scoring": 0.25, "defense": 0.20, "rebound": 0.20},
+        "PF": {"playmaking": 0.10, "scoring": 0.15, "defense": 0.25, "rebound": 0.20},
+        "C": {"playmaking": 0.05, "scoring": 0.20, "defense": 0.25, "rebound": 0.40}
+    }
+
+    def get_weight(self, attr_name, position):
+        weights = self.POSITION_WEIGHTS.get(position, {})
+
+        if attr_name in self.SCORING_ATTRS:
+            return weights.get("scoring", 0.2)
+        if attr_name in self.PLAYMAKING_ATTRS:
+            return weights.get("playmaking", 0.2)
+        if attr_name in self.DEFENSE_ATTRS:
+            return weights.get("defense", 0.2)
+        if attr_name in self.REBOUND_ATTRS:
+            return weights.get("rebound", 0.2)
+        return 0.2
+
+    def calculate_team_synergy(self, team_list):
+        """Calculates the 'Super Attribute' map for the entire team."""
+        team_attributes = {}
+
+        for p in team_list:
+            # FIX 1 & 2: Use self.normalize_name and self.get_weight
+            name_key = self.normalize_name(p['name'])
+            player_data = self.player_db.get(name_key, {})
+            attrs = player_data.get("attributes", {})
+            ovr_factor = player_data.get("overall", 80) / 100.0
+            pos = p.get('position', 'SF')
+
+            for attr_name, value in attrs.items():
+                weight = self.get_weight(attr_name, pos)
+                contribution = value * ovr_factor * weight
+                team_attributes[attr_name] = team_attributes.get(attr_name, 0) + contribution
+
+        return team_attributes
 
     def run_simulation(self):
-        # Ensure draft is complete
         user_players = [p for p in self.user_team.values() if p is not None]
         cpu_players = [p for p in self.cpu_team.values() if p is not None]
 
         if len(user_players) < 5 or len(cpu_players) < 5:
-            print("Draft not complete!")
             return
 
-        # Calculate team strength
-        def calculate_strength(player_list, team_label):
-            print(f"\n--- {team_label} Ratings ---")
-            total_overall = 0
-            for p in player_list:
-                # Look up in the database
-                data = self.player_db.get(normalize_name(p['name']), {"overall": 80})
-                rating = data.get("overall", 80)
+        u_team_map = self.calculate_team_synergy(user_players)
+        c_team_map = self.calculate_team_synergy(cpu_players)
 
-                # Print individual player rating
-                print(f"{p['name']}: {rating}")
+        u_rating = sum(u_team_map.values()) / len(u_team_map) if u_team_map else 0
+        c_rating = sum(c_team_map.values()) / len(c_team_map) if c_team_map else 0
 
-                total_overall += rating
+        print(f"🔵 User Team Rating:  {u_rating:.2f}")
+        print(f"🔴 CPU  Team Rating:  {c_rating:.2f}")
+        print(
+            f"📊 Avg Difference:    {u_rating - c_rating:.2f} ({'User advantage' if u_rating > c_rating else 'CPU advantage'})")
 
-            avg = total_overall / len(player_list)
-            return avg
+        differences = []
+        all_keys = set(u_team_map.keys()) | set(c_team_map.keys())
 
-        # Calculate and Print
-        u_pwr = calculate_strength(user_players, "USER TEAM")
-        c_pwr = calculate_strength(cpu_players, "CPU TEAM")
+        print("\n Attribute Difference Map (User - CPU):")
+        for attr in sorted(all_keys):
+            u_val = u_team_map.get(attr, 0)
+            c_val = c_team_map.get(attr, 0)
+            diff = u_val - c_val
+            arrow = "🔵" if diff >= 0 else "🔴"
+            print(f"  {arrow} {attr:<25} U: {u_val:>6.2f}  C: {c_val:>6.2f}  Δ: {diff:>+7.2f}")
 
-        print("-" * 30)
-        print(f"FINAL TEAM POWER -> USER: {u_pwr:.2f} | CPU: {c_pwr:.2f}")
-        print("-" * 30)
+        for attr in all_keys:
+            u_val = u_team_map.get(attr, 0)
+            c_val = c_team_map.get(attr, 0)
+            differences.append(u_val - c_val)
+
+        avg_diff = sum(differences) / len(differences) if differences else 0
 
         u_wins, c_wins, log = 0, 0, []
 
-        # Best of 7 Series
-        while u_wins < 4 and c_wins < 4:
-            u_performance = u_pwr + random.uniform(-3, 3)
-            c_performance = c_pwr + random.uniform(-3, 3)
+        win_chance = 0.5 + (avg_diff / 45)
+        win_chance = max(0.1, min(0.9, win_chance))
 
-            if u_performance > c_performance:
+        while u_wins < 4 and c_wins < 4:
+            if random.random() < win_chance:
                 u_wins += 1
                 log.append("W")
             else:
                 c_wins += 1
                 log.append("L")
 
-        self.show_results(u_wins, c_wins, log, u_pwr, c_pwr)
+        # FIX 3: Pass avg_diff as both u_pwr and use it to derive c_pwr (0 baseline)
+        self.show_results(u_wins, c_wins, log, avg_diff)
 
-    def show_results(self, u, c, log, u_pwr, c_pwr):
-        prob = 1 / (1 + pow(10, (c_pwr - u_pwr) / 15))
-        proj_w = round(prob * 82)
+    # FIX 3: Corrected signature — avg_diff encodes the user advantage over CPU
+    def show_results(self, u, c, log, avg_diff):
+        # avg_diff > 0 means user is stronger; treat CPU power as 0 baseline
+        u_pwr = avg_diff
+        c_pwr = 0
 
-        txt = f"SERIES RESULT: {u}-{c} \n82-GAME PROJECTION: {proj_w}-{82 - proj_w}"
+        prob = 1 / (1 + pow(10, (c_pwr - u_pwr) / 10))
+        proj_w = round(41 + prob*41)
+
+        print(f"🏆 Win rate: {prob}" )
+
+        result_str = " - ".join(log)
+        txt = f"SERIES RESULT: {u}-{c}  [{result_str}]\n82-GAME PROJECTION: {proj_w}-{82 - proj_w}"
         color = "#4BB543" if u == 4 else "#FF4B4B"
 
         self.after(0, lambda: self.status_label.config(text=txt, fg=color, font=("Arial Black", 14)))
