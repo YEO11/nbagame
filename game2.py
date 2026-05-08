@@ -5,6 +5,7 @@ import os
 from PIL import Image, ImageTk
 import unicodedata
 import random
+import math
 
 # --- CONFIG ---
 API_KEY = "2k_yq440mfukup3lmaxovd2cqdvf0xzy2z0"
@@ -302,8 +303,8 @@ class NBA2KSimGame(tk.Tk):
 
         u_wins, c_wins, log = 0, 0, []
 
-        win_chance = (u_rating / c_rating) * 0.5
-        win_chance = max(0.2, min(0.8, win_chance))
+        win_chance = 1 / (1 + math.exp(-0.1 * (u_rating - c_rating)))
+        win_chance = max(0.1, min(0.9, win_chance))
 
         print(f"\n🥊 Win rate: {win_chance}")
 
