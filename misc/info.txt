@@ -1,0 +1,115 @@
+=== INDIVIDUAL PLAYER SCORES AT THEIR POSITION ===
+
+[PG] Ranked by contribution:
+   1. Magic Johnson                  OVR=99  score=19.8815
+   2. Shai Gilgeous-Alexander        OVR=98  score=18.5606
+   3. Oscar Robertson                OVR=97  score=18.3153
+   4. Luka Doncic                    OVR=97  score=18.0570
+   5. Russell Westbrook              OVR=95  score=17.8654
+   6. Chris Paul                     OVR=97  score=17.7646
+   7. Jason Kidd                     OVR=95  score=17.6217
+   8. Derrick Rose                   OVR=95  score=17.5066
+   9. Stephen Curry                  OVR=98  score=17.3715
+  10. John Stockton                  OVR=97  score=17.3320
+  11. Isiah Thomas                   OVR=95  score=17.0007
+  12. Tony Parker                    OVR=95  score=16.9108
+  13. Steve Nash                     OVR=96  score=16.8472
+  14. Damian Lillard                 OVR=94  score=16.3939
+  15. Tyrese Haliburton              OVR=93  score=16.1873
+  16. Kyrie Irving                   OVR=94  score=16.0880
+  17. Ja Morant                      OVR=89  score=15.6002
+  18. Rajon Rondo                    OVR=90  score=15.3859
+  19. Trae Young                     OVR=88  score=14.1750
+
+[SG] Ranked by contribution:
+   1. Michael Jordan                 OVR=99  score=19.9134
+   2. Kobe Bryant                    OVR=99  score=19.2812
+   3. Dwyane Wade                    OVR=97  score=19.0087
+   4. Clyde Drexler                  OVR=96  score=18.7781
+   5. George Gervin                  OVR=94  score=18.4640
+   6. Vince Carter                   OVR=96  score=18.2817
+   7. Tracy McGrady                  OVR=95  score=18.1545
+   8. James Harden                   OVR=95  score=18.0549
+   9. Jerry West                     OVR=97  score=17.9106
+  10. Anthony Edwards                OVR=95  score=17.4727
+  11. Allen Iverson                  OVR=96  score=17.3642
+  12. Ray Allen                      OVR=94  score=17.3486
+  13. Jaylen Brown                   OVR=91  score=16.6847
+  14. Devin Booker                   OVR=92  score=16.6191
+  15. Donovan Mitchell               OVR=93  score=16.5346
+  16. Manu Ginobili                  OVR=90  score=16.1085
+  17. Klay Thompson                  OVR=91  score=15.7646
+  18. Tony Allen                     OVR=85  score=13.8783
+
+[SF] Ranked by contribution:
+   1. LeBron James                   OVR=99  score=18.6459
+   2. Julius Erving                  OVR=97  score=18.2504
+   3. Elgin Baylor                   OVR=96  score=18.1539
+   4. Scottie Pippen                 OVR=97  score=17.9284
+   5. Kawhi Leonard                  OVR=96  score=17.5598
+   6. Kevin Durant                   OVR=98  score=17.4714
+   7. Dominique Wilkins              OVR=95  score=17.4697
+   8. Larry Bird                     OVR=99  score=17.4602
+   9. Carmelo Anthony                OVR=95  score=17.2069
+  10. Jayson Tatum                   OVR=94  score=16.7180
+  11. Jimmy Butler                   OVR=93  score=16.4334
+  12. Paul Pierce                    OVR=94  score=16.3017
+  13. Paul George                    OVR=93  score=16.0911
+  14. DeMar DeRozan                  OVR=89  score=14.5268
+  15. Ron Artest                     OVR=88  score=14.0287
+  16. Andre Iguodala                 OVR=82  score=12.2433
+
+[PF] Ranked by contribution:
+   1. Kevin Garnett                  OVR=98  score=14.7409
+   2. Karl Malone                    OVR=97  score=14.6509
+   3. Tim Duncan                     OVR=98  score=14.6199
+   4. Giannis Antetokounmpo          OVR=97  score=14.4042
+   5. Anthony Davis                  OVR=94  score=13.8298
+   6. Dirk Nowitzki                  OVR=98  score=13.7889
+   7. Kevin McHale                   OVR=95  score=13.6170
+   8. Dennis Rodman                  OVR=93  score=12.9493
+   9. Chris Bosh                     OVR=90  score=12.5943
+  10. Pau Gasol                      OVR=92  score=12.4710
+  11. Draymond Green                 OVR=89  score=12.3023
+  12. Kevin Love                     OVR=91  score=12.2424
+  13. Blake Griffin                  OVR=90  score=12.2282
+  14. Zion Williamson                OVR=88  score=11.6090
+  15. Lauri Markkanen                OVR=87  score=10.6130
+
+[C] Ranked by contribution:
+   1. Bill Russell                   OVR=98  score=14.0465
+   2. Wilt Chamberlain               OVR=99  score=13.9658
+   3. Kareem Abdul-Jabbar            OVR=99  score=13.9647
+   4. Shaquille O'Neal               OVR=98  score=13.8382
+   5. Hakeem Olajuwon                OVR=99  score=13.7078
+   6. Moses Malone                   OVR=97  score=13.6559
+   7. Nikola Jokic                   OVR=98  score=13.0547
+   8. Dwight Howard                  OVR=94  score=12.9940
+   9. Victor Wembanyama              OVR=95  score=12.9569
+  10. David Robinson                 OVR=96  score=12.6539
+  11. Joel Embiid                    OVR=95  score=12.5617
+  12. Yao Ming                       OVR=91  score=11.1233
+  13. Rudy Gobert                    OVR=88  score=10.6641
+  14. Domantas Sabonis               OVR=88  score=10.5178
+
+=== BEST TEAM ===
+  PG: Magic Johnson (OVR 99)  → score=19.8815
+  SG: Michael Jordan (OVR 99)  → score=19.9134
+  SF: LeBron James (OVR 99)  → score=18.6459
+  PF: Kevin Garnett (OVR 98)  → score=14.7409
+  C: Bill Russell (OVR 98)  → score=14.0465
+
+  TEAM RATING: 87.2282
+
+=== WORST TEAM ===
+  PG: Trae Young (OVR 88)  → score=14.1750
+  SG: Tony Allen (OVR 85)  → score=13.8783
+  SF: Andre Iguodala (OVR 82)  → score=12.2433
+  PF: Lauri Markkanen (OVR 87)  → score=10.6130
+  C: Domantas Sabonis (OVR 88)  → score=10.5178
+
+  TEAM RATING: 61.4274
+
+=== WIN CHANCE (best vs worst): 90.00% ===
+    Logistic input diff: 25.8008
+    → This is capped at 90% by the code's max(0.1, min(0.9, ...))

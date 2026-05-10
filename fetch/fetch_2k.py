@@ -1,50 +1,13 @@
 import requests
 import json
 import time
+from misc.api import API_KEY
 
 # --- CONFIG ---
-API_KEY = "2k_yq440mfukup3lmaxovd2cqdvf0xzy2z0"
 SEARCH_URL = "https://api.nba2kapi.com/api/players/search"
+IMAGE_URL = ""
 
 # 1. PRE-HAND DATA (Manual injection for Shaq, Jokic, Luka)
-MANUAL_PLAYERS = {
-    "C": [
-        {
-            "name": "Nikola Jokic",
-            "overall": 98,
-            "tier": "Galaxy Opal",
-            "attributes": {
-                "outsideScoring": 92, "insideScoring": 92, "athleticism": 74, "playmaking": 85,
-                "rebounding": 88, "defending": 71, "threePointShot": 86, "midRangeShot": 98,
-                "closeShot": 99, "passAccuracy": 93, "postControl": 98, "standingDunk": 90
-            }
-        },
-        {
-            "name": "Shaquille O'Neal",
-            "overall": 98,
-            "tier": "Galaxy Opal",
-            "attributes": {
-                "outsideScoring": 32, "insideScoring": 91, "athleticism": 91, "playmaking": 59,
-                "rebounding": 98, "defending": 86, "threePointShot": 26, "standingDunk": 99,
-                "strength": 99, "block": 98, "interiorDefense": 98, "speed": 78
-            }
-        }
-    ],
-    "PG": [
-        {
-            "name": "Luka Doncic",
-            "overall": 97,
-            "tier": "Galaxy Opal",
-            "attributes": {
-                "outsideScoring": 87, "insideScoring": 84, "athleticism": 78, "playmaking": 93,
-                "rebounding": 71, "defending": 61, "threePointShot": 86, "ballHandle": 95,
-                "passAccuracy": 95, "speedWithBall": 83, "drivingLayup": 96
-            }
-        }
-    ]
-}
-
-
 def get_tier_name(overall):
     """Fallback to determine 'Badge Color' if the API doesn't provide a specific name."""
     if overall >= 99: return "Dark Matter"
@@ -122,7 +85,7 @@ def sync_all():
             time.sleep(0.1)
 
     # Final Save
-    with open("../data/2k_data.json", "w", encoding="utf-8") as f:
+    with open("../data/database/2k_data.json", "w", encoding="utf-8") as f:
         json.dump(synced_results, f, indent=4, ensure_ascii=False)
 
     print("\n🔥 All done! '2k_data.json' is ready with clean ratings.")

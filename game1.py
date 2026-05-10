@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH    = os.path.join(BASE_DIR, "data", "player_data.json")
+JSON_PATH    = os.path.join(BASE_DIR, "data", "database", "player_data.json")
 LOGOS_DIR    = os.path.join(BASE_DIR, "data", "logos")
 PLAYERS_DIR  = os.path.join(BASE_DIR, "data", "players")
 NUM_PLAYERS  = 2
@@ -146,7 +146,7 @@ class NBADraftApp(tk.Tk):
         self._render_rosters()
         self._start_turn()
 
-        self.icon_img = tk.PhotoImage(file="logo.png")
+        self.icon_img = tk.PhotoImage(file="misc/logo.png")
         self.iconphoto(False, self.icon_img)
 
     # ── UI BUILD ──────────────────────────────────────────────────────────────
